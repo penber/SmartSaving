@@ -68,7 +68,7 @@ export const addExpense = async (req, res) => {
     const savedExpense = await newExpense.save();
 
     // Web socket: Envoyer un message si nécessaire
-    // sendMessageToClient(clientId, { event: 'dépense ajoutée', expense: savedExpense });
+    sendMessageToClient(req.userId, { event: 'dépense ajoutée', expense: savedExpense });
 
     res.status(StatusCodes.CREATED).json(savedExpense);
   } catch (error) {
@@ -185,7 +185,7 @@ export const updateExpense = async (req, res) => {
 
 
 
-    sendMessageToClient("", { event: 'depensemsj', expense: expense });
+    sendMessageToClient(req.userId, { event: 'depensemsj', expense: expense });
 
 
     res.status(200).json(expense);
@@ -227,7 +227,7 @@ console.log(expense);
 
     res.status(200).json({ message: 'Dépense supprimée' });
 
-    // sendMessageToClient("", { event: 'depensesup', expenseId: req.params.id });
+    sendMessageToClient(req.userId, { event: 'depensesup', expenseId: req.params.id });
 
   } catch (error) {
     res.status(400).json({ message: error.message });

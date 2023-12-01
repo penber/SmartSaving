@@ -49,7 +49,7 @@ export const createBudget = async (req, res) => {
 
     const savedBudget = await newBudget.save();
 
-     sendMessageToClient("", { event: 'budgetCreated', budget: savedBudget });
+     sendMessageToClient(req.userId, { event: 'budgetCreated', budget: savedBudget });
 
     res.status(201).json(savedBudget);
   } catch (error) {
@@ -184,7 +184,7 @@ export const updateBudget = async (req, res) => {
     if (!budget) return res.status(404).json({ message: 'Budget non trouvé' });
 
   
-    sendMessageToClient('', { event: 'budget mise à jour', budget: budget });
+    sendMessageToClient(req.userId, { event: 'budget mise à jour', budget: budget });
 
     res.status(200).json(budget);
   } catch (error) {
@@ -220,7 +220,7 @@ export const deleteBudget = async (req, res) => {
     const budget = await Budget.findOneAndDelete({ _id: req.params.id, user: req.userId });
     if (!budget) return res.status(404).json({ message: 'Budget non trouvé' });
     //web socket
-    sendMessageToClient("", { event: 'budget éffacé', budgetId: req.params.id  });
+    sendMessageToClient(req.userId, { event: 'budget éffacé', budgetId: req.params.id  });
 
     res.status(200).json({ message: 'Budget supprimé' });
     

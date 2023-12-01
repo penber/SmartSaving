@@ -1,81 +1,150 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-  <title>Mon App</title>
-  <link rel="stylesheet" type="text/css" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Savings - Votre gestionnaire de budget intelligent</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+    }
+    .container {
+        width: 80%;
+        margin: auto;
+        overflow: hidden;
+    }
+    header {
+        background: #333;
+        color: #fff;
+        padding-top: 30px;
+        min-height: 70px;
+        border-bottom: #088cdd 3px solid;
+    }
+    header a {
+        color: #fff;
+        text-decoration: none;
+        text-transform: uppercase;
+        font-size: 16px;
+    }
+    header ul {
+        padding: 0;
+        list-style: none;
+    }
+    header li {
+        float: left;
+        display: inline;
+        padding: 0 20px 0 20px;
+    }
+    header #branding {
+        float: left;
+    }
+    header #branding h1 {
+        margin: 0;
+    }
+    header nav {
+        float: right;
+        margin-top: 10px;
+    }
+    header .highlight, header .current a {
+        color: #e9ff70;
+        font-weight: bold;
+    }
+    header a:hover {
+        color: #088cdd;
+        font-weight: bold;
+    }
+    .banner {
+        padding: 40px 0;
+        background-color: #088cdd;
+        color: #fff;
+        text-align: center;
+    }
+    .banner h1 {
+        margin: 0;
+        font-size: 2.5em;
+    }
+    .banner p {
+        font-size: 1.2em;
+    }
+    .main-col {
+        float: left;
+        width: 70%;
+    }
+    .sidebar {
+        float: right;
+        width: 30%;
+        background: #333;
+        color: #fff;
+        padding: 10px;
+    }
+    .box {
+        padding: 20px;
+        background: #fff;
+        margin-bottom: 20px;
+    }
+    footer {
+        background: #333;
+        color: #fff;
+        text-align: center;
+        padding: 10px;
+        position: relative;
+        bottom: 0;
+        width: 100%;
+    }
+</style>
 </head>
 <body>
-  <div id="main-container" style="display: flex; flex-direction: row;">
-    <!-- Formulaire d'inscription -->
-    <form id="signup-form">
-      <h2>Inscription</h2>
-      <input type="text" id="name" placeholder="Nom d'utilisateur">
-      <input type="email" id="email" placeholder="Email">
-      <input type="password" id="password" placeholder="Mot de passe">
-      <button type="submit">S'inscrire</button>
-    </form>
-  <br>
+    <header>
+        <div class="container">
+            <div id="branding">
+                <h1><span class="highlight">Smart</span> Savings</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="home.html">Accueil</a></li>
+                    <li class="current"><a href="about.html">A propos</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <section class="banner">
+        <div class="container">
+            <h1>Bienvenue sur Smart Savings</h1>
+            <p>Prenez le contrôle de vos finances avec facilité et efficacité</p>
+        </div>
+    </section>
 
-    <!-- Formulaire de connexion -->
-    <form id="login-form">
-      <h2>Connexion</h2>
-        <input type="email" id="login-email" placeholder="Email">
-        <input type="password" id="login-password" placeholder="Mot de passe">
-        <button type="submit">Se connecter</button>
-    </form>
-
-    <!-- Bouton de déconnexion -->
-    <button id="logout-btn">Se déconnecter</button>
-  </div>
-
-  <br>
-
-  <div id="sectionuser">
-  <!-- Formulaire pour ajouter un budget -->
-
-  <div style ="display: flex; flex-direction: row;"> 
-  <form id="budget-form">
-      <h2>Ajouter un Budget</h2>
-      <input type="number" id="allocatedAmount" placeholder="Montant alloué">
-      <input type="text" id="category" placeholder="Catégorie">
-      <button type="submit">Ajouter</button>
-    </form>
-  <br>
-
-</div>
-  <div style ="display: flex; flex-direction: row;">
-  <!-- Affichage des budgets -->
-  <h2>Budgets actuels</h2>
-  <ul id="budget-list">
-    <!-- Les budgets seront injectés ici -->
-  </ul>
-</div>
-<br>
-<br>
-
-
-  <form id="expense-form">
-    <label for="amount">Amount:</label><br>
-    <input type="number" id="amount" name="amount"><br>
-    <label for="description">Description:</label><br>
-    <input type="text" id="description" name="description"><br>
-    <label for="date">Date:</label><br>
-    <input type="date" id="date" name="date"><br>
-    <label for="budget-select">Budget:</label><br>
-    <select id="budget-select" name="budget">
-      <!-- Options will be populated dynamically -->
-    </select><br>
-    <input type="submit" value="Add Expense">
-  </form>
-  
-
-  <select id="budgetchoose">
-    <!-- Les options seront chargées par loadBudgets() -->
-  </select>
-  <div id="expenses-list">
-    <!-- Expenses will be populated dynamically -->
-  </div>
-  
-  </div>
-  <script src="script.js" type="module"></script>
+    <section class="main-col">
+        <div class="container">
+            <div class="box">
+                <h2>En développement</h2>
+                <p>Smart Savings est actuellement en cours de développement. Notre plateforme vous permettra de :</p>
+                <ul>
+                    <li>Gérer vos dépenses et budgets de manière intuitive</li>
+                    <li>Visualiser vos finances avec des rapports détaillés</li>
+                    <li>Planifier vos économies pour atteindre vos objectifs financiers</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    
+    <aside class="sidebar">
+        <div class="container">
+            <div class="box">
+                <h3>Contactez-nous</h3>
+                <p>Pour toute question ou suggestion, n'hésitez pas à nous contacter :</p>
+                <p>Email: contact@smartsavings.com</p>
+            </div>
+        </div>
+    </aside>
+    
+    <footer>
+        <div class="container">
+            <p>Smart Savings &copy; 2023, tous droits réservés.</p>
+        </div>
+    </footer>
 </body>
+</html>

@@ -1,50 +1,59 @@
 import createDebugger from 'debug';
 import { WebSocketServer } from 'ws';
-import { v4 as uuidv4 } from 'uuid';
+import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
-const debug = createDebugger('express-api:messaging');
+dotenv.config();
 
+const debug = createDebugger('express-api:messaging');
 
 let wss;
 let clients = new Map();
 
 function createWSServer(httpServer) {
     debug('Creating WebSocket server');
-    const wss = new WebSocketServer({
+    wss = new WebSocketServer({
         server: httpServer,
     });
 
-    // Handle new client connections.
     wss.on('connection', function (ws, req) {
-        console.debug('ws req', new URLSearchParams(req.url.replace(/.*\?/, '')).get('userId'));
-        debug('New WebSocket client connected');
-        // id unique pour chaque client
-        const clientId = uuidv4() ;
-        clients.set(clientId, ws);
+        const token = new URLSearchParams(req.url.replace(/.*\?/, '')).get('token');
+        if (!token) {
+            debug('No token provided by client');
+            ws.close();
+            return;
+        }
 
-      
-        // Listen for messages sent by clients.
+        let userId;
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            userId = decoded.id;
+        } catch (error) {
+            debug('Invalid token provided by client');
+            ws.close();
+            return;
+        }
+
+        debug('New WebSocket client connected with userId:', userId);
+        clients.set(userId, ws);
+
         ws.on('message', (message) => {
-            // Make sure the message is valid JSON.
             let parsedMessage;
             try {
                 parsedMessage = JSON.parse(message);
             } catch (err) {
-                // Send an error message to the client with "ws" if you want...
                 return debug('Invalid JSON message received from client');
             }
-
-            // Handle the message.
             onMessageReceived(ws, parsedMessage);
         });
 
-        // Clean up disconnected clients.
         ws.on('close', () => {
-          clients.delete(clientId);
+            clients.delete(userId);
         });
     });
 }
+
+
 
 export function broadcastMessage(message) {
     debug(
@@ -56,12 +65,15 @@ export function broadcastMessage(message) {
 }
 
 
-const sendMessageToClient = (clientId, message) => {
-  const client = clients.get(clientId);
-  if (client && client.readyState === WebSocket.OPEN) {
-    client.send(JSON.stringify(message));
-  }
-};
+const sendMessageToClient = (userId, message) => {
+    const client = clients.get(userId);
+    if (client && client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify(message));
+    } else {
+      debug(`WebSocket client with userId ${userId} not found or not open`);
+    }
+  };
+  
 
 export { createWSServer, sendMessageToClient };
 

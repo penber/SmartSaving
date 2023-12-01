@@ -3,7 +3,7 @@
 
   dotenv.config();
 
-  const SECRET_KEY = process.env.JWT_SECRET || 'MySuperSecretKey';
+  const SECRET_KEY = process.env.JWT_SECRET || 'mySuperSecret';
 
   export const verifyToken = (req, res, next) => {
     const authHeader = req.header('Authorization');

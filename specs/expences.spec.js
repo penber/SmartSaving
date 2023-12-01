@@ -5,6 +5,7 @@ import Budget from '../models/Budget.js';
 import User from '../models/User.js'; // Assurez-vous d'importer User
 import { jest } from '@jest/globals';
 import Expense from "../models/Expense.js";
+import { StatusCodes } from "http-status-codes";
 
 let token;
 let user;
@@ -105,6 +106,33 @@ describe('Tests /api/expenses', function () {
             expect(res.body).toEqual({ message: "Les informations fournies sont incomplètes." });
           });
 
+          it('should handle internal server error when creating an expense', async () => {
+            // Setup: Spy on the Expense.save method and mock its implementation to throw an error
+            const saveSpy = jest.spyOn(Expense.prototype, 'save');
+            saveSpy.mockRejectedValueOnce(new Error('Internal Server Error'));
+        
+            const expensesData = {
+              amount: 240,
+              description: 'nouvelle depense',
+              date: '2023-11-21T00:00:00.000Z',
+              // Include additional fields required by your Expense model
+            };
+                
+            // Act: Make a POST request to create a new expense
+            const res = await supertest(app)
+              .post('/api/expenses')
+              .set('Content-Type', 'application/json')
+              .set('Authorization', `Bearer ${token}`)
+              .send(expensesData)
+              .expect(StatusCodes.INTERNAL_SERVER_ERROR); // Expect an internal server error response
+        
+            // Assert: Check the response body for the correct error message
+            expect(res.body).toHaveProperty('message', 'Internal Server Error');
+        
+            // Restore the original implementation
+            saveSpy.mockRestore();
+          });
+        
      
         it('Trouver les dépenses dutilisateur spécifique', async () => {
        
@@ -202,6 +230,22 @@ describe('Tests /api/expenses', function () {
                 expect(expense).toHaveProperty('user');
 
     });
+
+    it('Updater une dépense spécific', async () => {
+
+      const updatedData = null
+
+      const res = await supertest(app)
+          .put(`/api/expenses/${expence_id}`) 
+          .set('Content-Type', 'application/json')
+          .set('Authorization', `Bearer ${token}`) 
+          .send(updatedData)
+          .expect(500); 
+
+});
+
+
+
 
     it('should return 404 if the expense to update is not found', async () => {
         const fakeId = '123456789012345678901234'; // Un ID MongoDB fictif
