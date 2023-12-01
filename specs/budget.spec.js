@@ -21,6 +21,7 @@ describe('POST /api/budgets', function () {
         const userRes = await supertest(app)
         .post('/api/users/register') // Assurez-vous que c'est le bon chemin
         .send({
+          username: 'testuser',
             email: 'test@gmail.com',
             password: 'testpassword',
         });

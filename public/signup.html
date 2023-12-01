@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mon App</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+  <div id="main-container" style="display: flex; flex-direction: row;">
+    <!-- Formulaire d'inscription -->
+    <form id="signup-form">
+      <h2>Inscription</h2>
+      <input type="text" id="name" placeholder="Nom d'utilisateur">
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="password" placeholder="Mot de passe">
+      <button type="submit">S'inscrire</button>
+    </form>
+  <br>
+
+    <!-- Formulaire de connexion -->
+    <form id="login-form">
+      <h2>Connexion</h2>
+        <input type="email" id="login-email" placeholder="Email">
+        <input type="password" id="login-password" placeholder="Mot de passe">
+        <button type="submit">Se connecter</button>
+    </form>
+
+    <!-- Bouton de déconnexion -->
+    <button id="logout-btn">Se déconnecter</button>
+  </div>
+
+  <br>
+
+  <div id="sectionuser">
+  <!-- Formulaire pour ajouter un budget -->
+
+  <div style ="display: flex; flex-direction: row;"> 
+  <form id="budget-form">
+      <h2>Ajouter un Budget</h2>
+      <input type="number" id="allocatedAmount" placeholder="Montant alloué">
+      <input type="text" id="category" placeholder="Catégorie">
+      <button type="submit">Ajouter</button>
+    </form>
+  <br>
+
+</div>
+  <div style ="display: flex; flex-direction: row;">
+  <!-- Affichage des budgets -->
+  <h2>Budgets actuels</h2>
+  <ul id="budget-list">
+    <!-- Les budgets seront injectés ici -->
+  </ul>
+</div>
+<br>
+<br>
+
+
+  <form id="expense-form">
+    <label for="amount">Amount:</label><br>
+    <input type="number" id="amount" name="amount"><br>
+    <label for="description">Description:</label><br>
+    <input type="text" id="description" name="description"><br>
+    <label for="date">Date:</label><br>
+    <input type="date" id="date" name="date"><br>
+    <label for="budget-select">Budget:</label><br>
+    <select id="budget-select" name="budget">
+      <!-- Options will be populated dynamically -->
+    </select><br>
+    <input type="submit" value="Add Expense">
+  </form>
+  
+
+  <select id="budgetchoose">
+    <!-- Les options seront chargées par loadBudgets() -->
+  </select>
+  <div id="expenses-list">
+    <!-- Expenses will be populated dynamically -->
+  </div>
+  
+  </div>
+  <script src="script.js" type="module"></script>
+</body>

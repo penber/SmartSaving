@@ -23,6 +23,7 @@ describe('POST /api/users', function () {
         const userRes = await supertest(app)
         .post('/api/users/register') // Assurez-vous que c'est le bon chemin
         .send({
+          username:'testuser',
             email: 'test2@gmail.com',
             password: 'testpassword',
         });

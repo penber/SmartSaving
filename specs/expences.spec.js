@@ -63,6 +63,36 @@ describe('Tests /api/expenses', function () {
             console.log(expence_id);
         });
 
+        it('should create a new expense with correct information and geolocation data', async () => {
+          const expensesData = {
+              amount: 240,
+              description: "nouvelle dépense",
+              date: "2023-11-21T00:00:00.000Z",
+              location: {
+                  type: 'Point',
+                  coordinates: [-73.935242, 40.730610] // Longitude et latitude exemple
+              }
+          };
+      
+          const res = await supertest(app)
+              .post('/api/expenses')
+              .set('Content-Type', 'application/json')
+              .set('Authorization', `Bearer ${token}`)
+              .send(expensesData)
+              .expect(201);
+      
+          expect(res.body).toHaveProperty('amount', expensesData.amount);
+          expect(res.body).toHaveProperty('description', expensesData.description);
+          expect(res.body).toHaveProperty('user');
+          expect(res.body.user).toEqual(expect.any(String));
+          expect(res.body).toHaveProperty('location');
+          expect(res.body.location).toHaveProperty('type', 'Point');
+          expect(res.body.location).toHaveProperty('coordinates');
+          expect(res.body.location.coordinates).toEqual(expect.arrayContaining(expensesData.location.coordinates));
+      
+          console.log(res.body._id);
+      });
+      
         it('envoyé des données incomplete pour créer une dépense', async () => {
             const incompleteData = { description: 'New Expense', date: new Date() }; // Montant manquant
           

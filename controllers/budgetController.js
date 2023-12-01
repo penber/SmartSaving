@@ -2,6 +2,34 @@ import Budget from '../models/Budget.js';
 import { sendMessageToClient } from '../utils/ws.js';
 
 
+
+
+/**
+ * @api {post} /budget Create a new budget
+ * @apiName CreateBudget
+ * @apiGroup Budget
+ * 
+ * @apiBody {Number} allocatedAmount Amount allocated for the budget
+ * @apiBody {String} category Category of the budget
+ * @apiBody {String} [user] User ID (optional, determined from token)
+ * 
+ * @apiSuccess {Object} budget Details of the created budget
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1 201 Created
+ *     {
+ *       "user": "652efb3d8ff75cc65d837096",
+ *       "allocatedAmount": 400,
+ *       "category": "rien",
+ *       "_id": "655d0b6f86a78aa02906d164",
+ *       "createdAt": "2023-11-21T19:56:31.806Z",
+ *       "updatedAt": "2023-11-21T19:56:31.806Z",
+ *       "__v": 0
+ *     }
+ * 
+ * @apiError (400 Bad Request) BadRequest Error message
+ */
+
+
 // Fonction pour créer un budget
 export const createBudget = async (req, res) => {
 
@@ -30,6 +58,33 @@ export const createBudget = async (req, res) => {
 };
 
 
+
+/**
+ * @api {get} /budgets Get all budgets
+ * @apiName GetAllBudgets
+ * @apiGroup Budget
+ * 
+ * @apiSuccess {Object[]} budgets List of budgets
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1 200 OK
+ *     [
+ *       {
+ *         "user": "652efb3d8ff75cc65d837096",
+ *         "allocatedAmount": 400,
+ *         "category": "Vacation",
+ *         "_id": "655d0b6f86a78aa02906d164",
+ *         "createdAt": "2023-11-21T19:56:31.806Z",
+ *         "updatedAt": "2023-11-21T19:56:31.806Z",
+ *         "__v": 0
+ *       },
+ *       // ... other budgets
+ *     ]
+ * 
+ * @apiError (400 Bad Request) BadRequest Error message
+ */
+
+
+
 // Fonction pour obtenir tous les budgets
 export const getAllBudgets = async (req, res) => {
   try {
@@ -39,6 +94,33 @@ export const getAllBudgets = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+
+
+/**
+ * @api {get} /budgets/:id Get a specific budget by ID
+ * @apiName GetBudgetById
+ * @apiGroup Budget
+ * 
+ * @apiParam {String} id Unique ID of the budget
+ * 
+ * @apiSuccess {Object} budget Details of the specific budget
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "user": "652efb3d8ff75cc65d837096",
+ *       "allocatedAmount": 400,
+ *       "category": "Vacation",
+ *       "_id": "655d0b6f86a78aa02906d164",
+ *       "createdAt": "2023-11-21T19:56:31.806Z",
+ *       "updatedAt": "2023-11-21T19:56:31.806Z",
+ *       "__v": 0
+ *     }
+ * 
+ * @apiError (404 Not Found) NotFound Budget not found
+ */
+
+
 
 
 // Fonction pour obtenir un budget spécifique par ID
@@ -51,6 +133,25 @@ export const getBudgetById = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+
+/**
+ * @api {put} /budgets/:id Update a budget
+ * @apiName UpdateBudget
+ * @apiGroup Budget
+ * 
+ * @apiParam {String} id Unique ID of the budget to update
+ * @apiBody {Number} allocatedAmount New allocated amount
+ * @apiBody {String} category New category
+ * 
+ * @apiSuccess {Object} budget Updated budget details
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "user": "652efb3d8ff75cc65d837096",
+ *       "allocatedAmount": 500,
+ *       "
+*/
 
 
 // Fonction pour mettre à jour un budget
@@ -91,6 +192,25 @@ export const updateBudget = async (req, res) => {
   };
 
 };
+
+
+/**
+ * @api {delete} /budgets/:id Delete a budget
+ * @apiName DeleteBudget
+ * @apiGroup Budget
+ * 
+ * @apiParam {String} id Unique ID of the budget to delete
+ * 
+ * @apiSuccess {String} message Confirmation message
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "message": "Budget supprimé"
+ *     }
+ * 
+ * @apiError (404 Not Found) NotFound Budget not found
+ */
+
 
 
 // Fonction pour supprimer un budget

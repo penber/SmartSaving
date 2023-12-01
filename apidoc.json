@@ -1,7 +1,8 @@
 {
     "name": "smart savings",
     "version": "1.0.0",
-    "description": "It is awesome",
+    "description": "Documentation pour smart savings",
     "title": "smart savings docs",
-    "url" : "https://smartsavings.onrender.com"
+    "url" : "https://smartsavings.onrender.com",
+    "include": ["/SmartSaving 2/controllers"]
   }

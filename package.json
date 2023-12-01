@@ -8,12 +8,14 @@
     "mongo": "node app.js",
     "dev": "nodemon app.js",
     "dev:start": "nodemon ./bin/start",
+    "apidoc": "apidoc -i routes controllers -o docs",
     "test": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage --runInBand"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "debug": "~4.3.4",
     "dotenv": "^16.3.1",
+    "apidoc": "^1.2.0",
     "express": "~4.18.2",
     "express-validator": "^7.0.1",
     "http-errors": "^2.0.0",

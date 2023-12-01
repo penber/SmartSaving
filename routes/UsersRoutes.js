@@ -18,6 +18,7 @@ import { notFound, errorHandler } from '../middleware/errorMiddleware.js';
 
 const router = express.Router();
 
+
 router.post('/register', [
 
   check('email').isEmail().withMessage('Email invalide'),
@@ -25,10 +26,24 @@ router.post('/register', [
   check('password').isLength({ min: 5 }).withMessage('Le mot de passe doit comporter au moins 5 caractères')
  ], register);
 
+
+ 
+
+
 router.post('/login', login);
+
+
+
 router.post('/logout', verifyToken, logout);
+
+
+
+
 // Route pour obtenir le profil de l'utilisateur
 router.get('/:id', verifyToken, getUserProfile);
+
+
+
 
 // mettre à jour le profil de l'utilisateur
 router.put('/:id', verifyToken, updateUserProfile);
@@ -37,4 +52,4 @@ router.put('/:id', verifyToken, updateUserProfile);
 router.use(notFound);
 router.use(errorHandler);
 
-export default router;
+export default router;

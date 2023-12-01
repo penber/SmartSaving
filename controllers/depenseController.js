@@ -3,15 +3,45 @@ import Expense from '../models/Expense.js';
 import { StatusCodes } from 'http-status-codes';
 import { sendMessageToClient } from '../utils/ws.js';
 
+
+/**
+ * @api {post} /expenses Ajouter une dépense
+ * @apiName AddExpense
+ * @apiGroup Expense
+ * 
+ * @apiBody {Number} amount Montant de la dépense
+ * @apiBody {String} description Description de la dépense
+ * @apiBody {Date} date Date de la dépense
+ * @apiBody {String} budgetId ID du budget associé
+ * 
+ * @apiSuccess {Object} expense Détails de la dépense créée
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1 201 Created
+ *     {
+ *       "user": "652efb3d8ff75cc65d837096",
+ *       "amount": 20,
+ *       "description": "Macdo",
+ *       "date": "2023-11-21T00:00:00.000Z",
+ *       "budget": "655d0b6f86a78aa02906d164",
+ *       "_id": "655d0f04aa5c69420dc185ef",
+ *       "createdAt": "2023-11-21T20:11:48.992Z",
+ *       "updatedAt": "2023-11-21T20:11:48.992Z",
+ *       "__v": 0
+ *     }
+ * 
+ * @apiError (400 Bad Request) BadRequest Information manquante ou invalide
+ * @apiError (404 Not Found) NotFound Budget non trouvé
+ */
+
+
 export const addExpense = async (req, res) => {
-  const { amount, description, date, budgetId } = req.body;
+  const { amount, description, date, budgetId, location } = req.body;
 
   // Validation des entrées
   if (!amount || !description || !date) {
     return res.status(StatusCodes.BAD_REQUEST).json({ message: "Les informations fournies sont incomplètes." });
   }
 
-  // Valider l'existence du budget et qu'il appartient à l'utilisateur
   if (budgetId) {
     let budget;
     try {
@@ -28,16 +58,42 @@ export const addExpense = async (req, res) => {
   }
 
   try {
-    const newExpense = new Expense({ amount, description, date, user: req.userId, budget: budgetId });
+    const expenseData = { amount, description, date, user: req.userId, budget: budgetId };
+
+    if (location) {
+      expenseData.location = location;
+    }
+
+    const newExpense = new Expense(expenseData);
     const savedExpense = await newExpense.save();
-    //web socket 
-    // sendMessageToClient(clientId, { event: 'dépense ajputé', expense: savedExpense  });
+
+    // Web socket: Envoyer un message si nécessaire
+    // sendMessageToClient(clientId, { event: 'dépense ajoutée', expense: savedExpense });
 
     res.status(StatusCodes.CREATED).json(savedExpense);
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
   }
 };
+
+
+
+
+/**
+ * @api {get} /expenses Obtenir toutes les dépenses
+ * @apiName GetAllExpenses
+ * @apiGroup Expense
+ * 
+ * @apiSuccess {Object[]} expenses Liste des dépenses
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1 200 OK
+ *     [
+ *       // ...liste des dépenses
+ *     ]
+ * 
+ * @apiError (400 Bad Request) BadRequest Erreur lors de la récupération des données
+ */
+
 
 
 // Fonction pour obtenir toutes les dépenses
@@ -50,6 +106,25 @@ export const getAllExpenses = async (req, res) => {
   }
 };
 
+
+/**
+ * @api {get} /expenses/:id Obtenir une dépense spécifique
+ * @apiName GetExpenseById
+ * @apiGroup Expense
+ * 
+ * @apiParam {String} id ID unique de la dépense
+ * 
+ * @apiSuccess {Object} expense Détails de la dépense spécifique
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       // ...détails de la dépense
+ *     }
+ * 
+ * @apiError (404 Not Found) NotFound Dépense non trouvée
+ */
+
+
 export const getExpenseById = async (req, res) => {
   try {  
     const expense = await Expense.findOne({ _id: req.params.id, user: req.userId }).populate('budget');
@@ -59,6 +134,31 @@ export const getExpenseById = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+
+/**
+ * @api {put} /expenses/:id Update an expense
+ * @apiName UpdateExpense
+ * @apiGroup Expense
+ * 
+ * @apiParam {String} id ID of the expense to update
+ * @apiBody {Number} amount New amount
+ * @apiBody {String} description New description
+ * @apiBody {Date} date New date
+ * @apiBody {String} [budgetId] New associated budget ID (optional)
+ * 
+ * @apiSuccess {Object} expense Updated expense details
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       ... // Updated expense details
+ *     }
+ * 
+ * @apiError (404 Not Found) NotFound Expense not found
+ */
+
+
+
 
 // Fonction pour mettre à jour une dépense
 export const updateExpense = async (req, res) => {
@@ -94,6 +194,27 @@ export const updateExpense = async (req, res) => {
   }
 };
 
+
+/**
+ * @api {delete} /expenses/:id Delete an expense
+ * @apiName DeleteExpense
+ * @apiGroup Expense
+ * 
+ * @apiParam {String} id Unique ID of the expense to delete
+ * 
+ * @apiSuccess {String} message Message confirming the deletion
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "message": "Dépense supprimée"
+ *     }
+ * 
+ * @apiError (404 Not Found) NotFound Expense not found
+ * @apiError (400 Bad Request) BadRequest Error message
+ */
+
+
+
 // Fonction pour supprimer une dépense
 export const deleteExpense = async (req, res) => {
   try {
@@ -113,6 +234,23 @@ console.log(expense);
   }
 };
 
+/**
+ * @api {get} /expenses/by-budget/:budgetName Get expenses by budget name
+ * @apiName GetExpensesByBudget
+ * @apiGroup Expense
+ * 
+ * @apiParam {String} budgetName Name of the budget
+ * 
+ * @apiSuccess {Object[]} expenses List of expenses for the specified budget
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1 200 OK
+ *     [ ... Array of expenses objects ... ]
+ * 
+ * @apiError (404 Not Found) NotFound Budget not found
+ * @apiError (500 Internal Server Error) InternalServerError Error message
+ */
+
+
 export const getExpensesByBudgetId = async (req, res) => {
   try {
     const budgetName = req.params.budgetName;
@@ -127,6 +265,21 @@ export const getExpensesByBudgetId = async (req, res) => {
   }
 };
 
+/**
+ * @api {get} /expenses/filtrer Filter expenses
+ * @apiName FilterExpenses
+ * @apiGroup Expense
+ * 
+ * @apiQuery {String} [category] Category to filter by
+ * @apiQuery {Date} [date] Date to filter by
+ * 
+ * @apiSuccess {Object[]} expenses List of filtered expenses
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1 200 OK
+ *     [ ... Array of filtered expenses objects ... ]
+ * 
+ * @apiError (500 Internal Server Error) InternalServerError Error message
+ */
 
 
 export const filtreexpenses = async (req, res) => {
