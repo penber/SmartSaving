@@ -110,7 +110,7 @@ export const login = async (req, res) => {
   });
 
  
-  res.status(200).json({ token });
+  res.status(200).json({ token, userId: user._id  });
 };
 
 
@@ -129,9 +129,12 @@ export const login = async (req, res) => {
 
 
 export const logout = (req, res) => {
-
+  
   res.status(200).send('Déconnecté');
 };
+
+
+
 
 export const getUserProfile = async (req, res) => {
   const userId = req.params.id;
