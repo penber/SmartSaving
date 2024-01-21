@@ -67,7 +67,7 @@ export const register = async (req, res) => {
   const token = jwt.sign(payload, jwtSecret, { expiresIn: '111d' });
 
   // Envoyer la réponse avec le token
-  res.status(201).json({ message: 'Utilisateur créé', token });
+  res.status(201).json({ message: 'Utilisateur créé', token,  userId: user._id  });
 };
 
 
