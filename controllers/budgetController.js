@@ -1,6 +1,6 @@
 import Budget from '../models/Budget.js';
 import { sendMessageToClient } from '../utils/ws.js';
-
+import Expense from '../models/Expense.js';
 
 
 
@@ -193,6 +193,21 @@ export const updateBudget = async (req, res) => {
 
 };
 
+
+export const getExpensesByBudgetId = async (req, res) => {
+  try {
+    const budgetId = req.params.budgetId;
+    const expenses = await Expense.find({ budget: budgetId, user: req.userId });
+
+    if (!expenses.length) {
+      return res.status(404).json({ message: 'Aucune dépense trouvée pour ce budget.' });
+    }
+
+    res.status(200).json(expenses);
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+};
 
 /**
  * @api {delete} /budgets/:id Delete a budget

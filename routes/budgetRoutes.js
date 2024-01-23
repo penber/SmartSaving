@@ -4,7 +4,8 @@ import {
   getAllBudgets,
   getBudgetById,
   updateBudget,
-  deleteBudget
+  deleteBudget,
+  getExpensesByBudgetId
 } from '../controllers/budgetController.js';
 import { verifyToken, checkAuthorization } from '../middleware/authMiddleware.js';
 
@@ -95,6 +96,38 @@ router.put('/:id', verifyToken, checkAuthorization, updateBudget);
  */
 
 
+/**
+ * @api {get} /expenses/by-budget/:budgetId Get all expenses associated with a budget
+ * @apiName GetExpensesByBudgetId
+ * @apiGroup ExpenseRoute
+ * 
+ * @apiHeader {String} Authorization User's auth token
+ * @apiParam {String} budgetId Unique ID of the budget
+ * 
+ * @apiSuccess {Object[]} expenses List of all expenses associated with the budget
+ * 
+ * @apiError (404 Not Found) NotFound Budget not found
+ 
+ */
+router.get('/by-budget/:budgetId', verifyToken, checkAuthorization, getExpensesByBudgetId);
+
+
+/**
+ * @api {delete} /budgets/:id Delete a budget
+ * @apiName DeleteBudget
+ * @apiGroup BudgetRoute
+ * 
+ * @apiHeader {String} Authorization User's auth token
+ * @apiParam {String} id Unique ID of the budget to delete
+ * 
+ * @apiSuccess {String} message Confirmation message
+ * 
+ * @apiError (404 Not Found) NotFound Budget not found
+ * 
+ * @apiError (400 Bad Request) BadRequest Error message
+ * 
+ * @apiError (401 Unauthorized) Unauthorized Error message
+ */
 // Route pour supprimer un budget
 router.delete('/:id', verifyToken, checkAuthorization, deleteBudget);
 
