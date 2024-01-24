@@ -27,47 +27,38 @@ dotenv.config();
  * @apiError (400 Bad Request) BadRequest Email déjà enregistré / Validation error
  */
 
-
 export const register = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-  const { email, password } = req.body;
+    const { email, password } = req.body;
 
-  const userExists = await User.findOne({ email });
-  if (userExists) {
-    return res.status(400).send('Email déjà enregistré');
-  }
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).send('Email déjà enregistré');
+    }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  let user;
-  if(req.body.username){
-    const { username } = req.body;
-    user = new User({
+    let user = new User({
       email,
       password: hashedPassword,
-      username
+      username: req.body.username
     });
-  } else {
-    user = new User({
-      email,
-      password: hashedPassword,
-    });
+
+    await user.save();
+    
+    const payload = { id: user.id };
+    const jwtSecret = process.env.JWT_SECRET || 'mySuperSecret';
+    const token = jwt.sign(payload, jwtSecret, { expiresIn: '111d' });
+
+    res.status(201).json({ message: 'Utilisateur créé', token, userId: user._id });
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur serveur', error: error.message });
   }
-
-
-  await user.save();
-  
-  // Création du token JWT
-  const payload = {  id: user.id };
-  const jwtSecret = process.env.JWT_SECRET || 'mySuperSecret';
-  const token = jwt.sign(payload, jwtSecret, { expiresIn: '111d' });
-
-  // Envoyer la réponse avec le token
-  res.status(201).json({ message: 'Utilisateur créé', token,  userId: user._id  });
 };
 
 
@@ -89,30 +80,28 @@ export const register = async (req, res) => {
  * @apiError (400 Bad Request) BadRequest Utilisateur non trouvé / Mot de passe incorrect
  */
 
-
 export const login = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
-  if (!user) {
-    return res.status(400).send('Utilisateur non trouvé');
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).send('Utilisateur non trouvé');
+    }
+
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return res.status(400).send('Mot de passe incorrect');
+    }
+
+    const SECRET_KEY = process.env.JWT_SECRET;
+    const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: '1000d' });
+
+    res.status(200).json({ token, userId: user._id });
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur serveur', error: error.message });
   }
-
-  const validPassword = await bcrypt.compare(password, user.password);
-  if (!validPassword) {
-    return res.status(400).send('Mot de passe incorrect');
-  }
-
-  // Générez le SECRET_KEY avec jwt
-  const SECRET_KEY = process.env.JWT_SECRET; // Utilisez la clé secrète à partir de .env
-  const token = jwt.sign({ id: user._id }, SECRET_KEY, {
-    expiresIn: '1000d',
-  });
-
- 
-  res.status(200).json({ token, userId: user._id  });
 };
-
 
 /**
  * @api {post} /logout Logout a user
@@ -129,7 +118,6 @@ export const login = async (req, res) => {
 
 
 export const logout = (req, res) => {
-  
   res.status(200).send('Déconnecté');
 };
 

@@ -197,10 +197,18 @@ export const updateBudget = async (req, res) => {
 export const getExpensesByBudgetId = async (req, res) => {
   try {
     const budgetId = req.params.budgetId;
+
+    // Vérifier si le budget existe
+    const budgetExists = await Budget.findById(budgetId);
+    if (!budgetExists) {
+      return res.status(404).json({ message: 'Budget non trouvé.' });
+    }
+
     const expenses = await Expense.find({ budget: budgetId, user: req.userId });
 
+    // Renvoyer un tableau vide si aucune dépense n'est trouvée
     if (!expenses.length) {
-      return res.status(404).json({ message: 'Aucune dépense trouvée pour ce budget.' });
+      return res.status(200).json([]);
     }
 
     res.status(200).json(expenses);
@@ -208,6 +216,7 @@ export const getExpensesByBudgetId = async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur.' });
   }
 };
+
 
 /**
  * @api {delete} /budgets/:id Delete a budget
