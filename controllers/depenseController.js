@@ -163,36 +163,36 @@ export const getExpenseById = async (req, res) => {
 // Fonction pour mettre à jour une dépense
 export const updateExpense = async (req, res) => {
   try {
+    const { amount, description, date, budgetId, location } = req.body;
+    const updateData = { amount, description, date };
 
-    let expense;
-
-    const { amount, description, date, budgetId  } = req.body;
-
-    if(!budgetId) {
-       expense = await Expense.findOneAndUpdate(
-        { _id: req.params.id, user: req.userId },
-        { amount, description, date },
-        { new: true }
-      );
-    } else {
-      expense = await Expense.findOneAndUpdate(
-        { _id: req.params.id, user: req.userId },
-        { amount, description, date,budget: budgetId },
-        { new: true }
-      );
+    // Ajouter budgetId si fourni
+    if (budgetId) {
+      updateData.budget = budgetId;
     }
-    if (!expense) return res.status(404).json({ message: 'Dépense non trouvée' });
 
+    // Ajouter location si fournie
+    if (location) {
+      updateData.location = location;
+    }
 
+    const expense = await Expense.findOneAndUpdate(
+      { _id: req.params.id, user: req.userId },
+      updateData,
+      { new: true }
+    );
+
+    if (!expense) {
+      return res.status(404).json({ message: 'Dépense non trouvée' });
+    }
 
     sendMessageToClient(req.userId, { event: 'depensemsj', expense: expense });
-
-
     res.status(200).json(expense);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
+
 
 
 /**
