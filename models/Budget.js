@@ -15,6 +15,11 @@ const BudgetSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    //couleur hexa 
+    color: {
+      type: String,
+      required: false,
+    },
   },
   {
     timestamps: true,

@@ -3,6 +3,8 @@ import { sendMessageToClient } from '../utils/ws.js';
 import Expense from '../models/Expense.js';
 
 
+const isHexColor = (color) => /^#([0-9A-F]{3}){1,2}$/i.test(color);
+
 
 /**
  * @api {post} /budget Create a new budget
@@ -31,32 +33,24 @@ import Expense from '../models/Expense.js';
 
 
 // Fonction pour créer un budget
-export const createBudget = async (req, res) => {
 
-  const { allocatedAmount, category, } = req.body; 
-  let user ;
-  //récupérer l'id de l'utilisateur de la requête si l'utilisateur est connecté
-  if(req.userId) {user= req.userId;} 
-  else if (req.body.id) 
-  {user = req.body.id;};
+export const createBudget = async (req, res) => {
+  const { allocatedAmount, category, color } = req.body;
+  let user = req.userId || req.body.id;
+
+  if (color && !isHexColor(color)) {
+    return res.status(400).json({ message: 'Format de couleur invalide' });
+  }
 
   try {
-    const newBudget = new Budget({
-      allocatedAmount,
-      category,
-      user
-    });
-
+    const newBudget = new Budget({ allocatedAmount, category, user, color });
     const savedBudget = await newBudget.save();
-
-     sendMessageToClient(req.userId, { event: 'budgetCreated', budget: savedBudget });
-
+    sendMessageToClient(req.userId, { event: 'budgetCreated', budget: savedBudget });
     res.status(201).json(savedBudget);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
-
 
 
 /**
@@ -156,42 +150,32 @@ export const getBudgetById = async (req, res) => {
 
 // Fonction pour mettre à jour un budget
 export const updateBudget = async (req, res) => {
-  const { allocatedAmount, category} = req.body;
-
-  //verifier si les champs sont remplis
+  const { allocatedAmount, category, color } = req.body;
+  let user = req.userId;
 
   if (!allocatedAmount || !category) {
     return res.status(400).json({ message: 'Veuillez remplir tous les champs' });
   }
-  try {
-   
-    let budget;
-    let user ;
-    if(req.userId) {user= req.userId;} 
-    else {console.log("pas d'id")};
 
-
-   try { 
-     budget = await Budget.findOneAndUpdate(
-      { _id: req.params.id, user: user },
-      { allocatedAmount, category },
-      { new: true }
-    ); } catch (error) {
-        res.status(400).json({ message: error.message });
-
+  if (color && !isHexColor(color)) {
+    return res.status(400).json({ message: 'Format de couleur invalide' });
   }
 
+  try {
+    let budget = await Budget.findOneAndUpdate(
+      { _id: req.params.id, user: user },
+      { allocatedAmount, category, color },
+      { new: true }
+    );
+
     if (!budget) return res.status(404).json({ message: 'Budget non trouvé' });
-
-  
     sendMessageToClient(req.userId, { event: 'budget mise à jour', budget: budget });
-
     res.status(200).json(budget);
   } catch (error) {
     res.status(400).json({ message: error.message });
-  };
-
+  }
 };
+
 
 
 export const getExpensesByBudgetId = async (req, res) => {
