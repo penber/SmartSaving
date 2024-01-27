@@ -158,22 +158,27 @@ export const getUserProfile = async (req, res) => {
 
 
 export const updateUserProfile = async (req, res) => {
-  const userId = req.userId;
+  const { userId, body: { username, email, password } } = req;
 
-  let password = req.body.password;
-  let email = req.body.email;
-  if(!password && !email){
-  return res.status(400).send('Email et mot de passe manquant');}
-  
-  if(!userId){
-    return res.status(404).send('Utilisateur non trouvé');
+  if (!username && !email && !password) {
+    return res.status(400).send('Données manquantes pour la mise à jour');
   }
-  await User.findByIdAndUpdate(userId, { password, email });
-  //chercher le user modifié et mettre à jour le token
-//gerer lerreur si le user nexiste pas
 
-  const newuser = await User.findById(userId);
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId, 
+      { username, email, password }, 
+      { new: true, omitUndefined: true }
+    );
 
-  console.log(newuser);
-  res.status(200).send(newuser);
+    if (!updatedUser) {
+      return res.status(404).send('Utilisateur non trouvé');
+    }
+
+    updatedUser.password = undefined;
+    res.status(200).send(updatedUser);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Erreur serveur');
+  }
 };
