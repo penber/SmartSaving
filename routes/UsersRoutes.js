@@ -4,7 +4,8 @@ import {
   login,
   logout,
   getUserProfile,
-  updateUserProfile
+  updateUserProfile,
+  deleteUser
 } from '../controllers/userController.js';
 
 import {
@@ -112,6 +113,10 @@ router.get('/:id', verifyToken, getUserProfile);
 
 // mettre à jour le profil de l'utilisateur
 router.put('/:id', verifyToken, updateUserProfile);
+
+//supprimer un utilisateur
+
+router.delete('/:id', verifyToken, deleteUser);
 
 // Middleware pour gérer les erreurs
 router.use(notFound);
