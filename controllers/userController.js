@@ -85,8 +85,8 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).send('Utilisateur non trouvé');
+    if (!user || !user.isActive) {
+      return res.status(400).send('Utilisateur non trouvé ou compte inactif');
     }
 
     const validPassword = await bcrypt.compare(password, user.password);
@@ -182,3 +182,16 @@ export const updateUserProfile = async (req, res) => {
     res.status(500).send('Erreur serveur');
   }
 };
+
+
+
+export const deleteUser = async (req, res) => {
+  const userId = req.params.id;
+
+  const user = await User.findByIdAndUpdate(userId, { isActive: false });
+  if (!user) {
+    return res.status(404).send('Utilisateur non trouvé');
+  }
+
+  res.status(200).json({ message: 'Utilisateur désactivé' });
+}

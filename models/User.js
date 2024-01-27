@@ -12,10 +12,15 @@ const Users = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-    }},
-    {
-        timestamps: true,
-      }
-);
+    },
+    isActive: {
+        type: Boolean,
+        required: true,
+        default: true,
+    },
+},
+{
+    timestamps: true,
+});
 
 export default mongoose.model('User', Users);
